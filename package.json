@@ -1,0 +1,15 @@
+{
+    "name": "hog-descriptor",
+    "description": "Histogram of Oriented Gradients (HOG) descriptor extractor",
+    "version": "0.1.0",
+    "author": "Heather Arthur <fayearthur@gmail.com>",
+    "main": "./hog",
+    "repository": {
+        "type": "git",
+        "url": "http://github.com/harthur/hog-descriptor.git"
+    },
+    "dependencies": {
+        "underscore" : "*"
+    },
+    "keywords": ["image processing", "computer vision"]
+}
