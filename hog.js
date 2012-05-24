@@ -49,10 +49,10 @@ function getBlock(matrix, x, y, length) {
   for (var i = y; i < y + length; i++) {
     var row = matrix[i];
     for (var j = x; j < x + length; j++) {
-      square.push(row[j]);
+      square = square.concat(row[j]);
     }
   }
-  return _(square).flatten();
+  return square;
 }
 
 
