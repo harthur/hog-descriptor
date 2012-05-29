@@ -19,14 +19,15 @@ npm install hog-descriptor
 
 # API
 
-`extractHOG()` takes options for the cell size (default is 6 pixels), block size (default is 2 cells), number of bins per orientation histogram (default is 6), and block normalization method (one of `"L1"` (default), `"L1-sqrt"`, and `"L2"`):
+`extractHOG()` takes options for the cell size (default is `6` pixels), block size (default is `2` cells), block stride (default is `blockSize / 2`), number of bins per orientation histogram (default is `6`), and block normalization method (one of `"L1"` (default), `"L1-sqrt"`, and `"L2"`):
 
 ```javascript
 var options = {
-  cellSize: 6,   // length of cell in px
-  blockSize: 2,  // length of block in number of cells
-  bins: 6,       // bins per histogram
-  norm: 'L1'     // block normalization method
+  cellSize: 6,    // length of cell in px
+  blockSize: 2,   // length of block in number of cells
+  blockStride: 1, // number of cells to slide block window by (block overlap)
+  bins: 6,        // bins per histogram
+  norm: 'L1'      // block normalization method
 }
 
 var descriptor = hog.extractHOG(canvas, options);

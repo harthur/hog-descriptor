@@ -9,6 +9,7 @@ exports.extractHOG = function(canvas, options) {
   var cellSize = options.cellSize || 6;
   var blockSize = options.blockSize || 2;
   var bins = options.bins || 6;
+  var blockStride = options.blockStride || (blockSize / 2);
   var normalize = norms[options.norm || "L1"];
 
   var vectors = processing.gradientVectors(canvas);
@@ -25,17 +26,17 @@ exports.extractHOG = function(canvas, options) {
       histograms[i][j] = getHistogram(cell, bins);
     }
   }
-  var blocks = getNormalizedBlocks(histograms, blockSize, normalize);
+  var blocks = getNormalizedBlocks(histograms, blockSize, blockStride, normalize);
   return _(blocks).flatten();
 }
 
-function getNormalizedBlocks(histograms, blockSize, normalize) {
+function getNormalizedBlocks(histograms, blockSize, blockStride, normalize) {
   var blocks = [];
   var blocksHigh = histograms.length - blockSize + 1;
   var blocksWide = histograms[0].length - blockSize + 1;
 
-  for (var y = 0; y < blocksHigh; y++) {
-    for (var x = 0; x < blocksWide; x++) {
+  for (var y = 0; y < blocksHigh; y += blockStride) {
+    for (var x = 0; x < blocksWide; x += blockStride) {
       var block = getBlock(histograms, x, y, blockSize);
       normalize(block);
       blocks.push(block);
