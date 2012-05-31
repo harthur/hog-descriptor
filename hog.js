@@ -1,8 +1,10 @@
-var _ = require("underscore"),
-    processing = require("./processing"),
+var processing = require("./processing"),
     norms = require("./norms");
 
-_(module.exports).extend(processing);
+// also export all the functions from processing.js
+for (var func in processing) {
+  exports[func] = processing[func];
+}
 
 exports.extractHOG = function(canvas, options) {
   options = options || {};
@@ -22,12 +24,12 @@ exports.extractHOG = function(canvas, options) {
     histograms[i] = new Array(cellsWide);
 
     for (var j = 0; j < cellsWide; j++) {
-      var cell = getSquare(vectors, j * cellSize, i * cellSize, cellSize);
-      histograms[i][j] = getHistogram(cell, bins);
+      histograms[i][j] = getHistogram(vectors, j * cellSize, i * cellSize,
+                                      cellSize, bins);
     }
   }
   var blocks = getNormalizedBlocks(histograms, blockSize, blockStride, normalize);
-  return _(blocks).flatten();
+  return blocks;
 }
 
 function getNormalizedBlocks(histograms, blockSize, blockStride, normalize) {
@@ -42,7 +44,7 @@ function getNormalizedBlocks(histograms, blockSize, blockStride, normalize) {
       blocks.push(block);
     }
   }
-  return blocks;
+  return Array.prototype.concat.apply([], blocks);
 }
 
 function getBlock(matrix, x, y, length) {
@@ -50,38 +52,23 @@ function getBlock(matrix, x, y, length) {
   for (var i = y; i < y + length; i++) {
     var row = matrix[i];
     for (var j = x; j < x + length; j++) {
-      square = square.concat(row[j]);
+      square.push(row[j]);
     }
   }
-  return square;
+  return Array.prototype.concat.apply([], square);
 }
 
-
-function getHistogram(cell, bins) {
+function getHistogram(elements, x, y, size, bins) {
   var histogram = zeros(bins);
-  var size = cell.length;
 
   for (var i = 0; i < size; i++) {
     for (var j = 0; j < size; j++) {
-      var vector = cell[i][j];
+      var vector = elements[y + i][x + j];
       var bin = binFor(vector.orient, bins);
       histogram[bin] += vector.mag;
     }
   }
   return histogram;
-}
-
-function getSquare(elements, x, y, size) {
-  var square = new Array(size);
-
-  for (var i = 0; i < size; i++) {
-    square[i] = new Array(size);
-
-    for (var j = 0; j < size; j++) {
-      square[i][j] = elements[y + i][x + j];
-    }
-  }
-  return square;
 }
 
 function binFor(radians, bins) {
