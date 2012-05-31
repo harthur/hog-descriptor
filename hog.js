@@ -8,7 +8,7 @@ for (var func in processing) {
 
 exports.extractHOG = function(canvas, options) {
   options = options || {};
-  var cellSize = options.cellSize || 6;
+  var cellSize = options.cellSize || 4;
   var blockSize = options.blockSize || 2;
   var bins = options.bins || 6;
   var blockStride = options.blockStride || (blockSize / 2);
