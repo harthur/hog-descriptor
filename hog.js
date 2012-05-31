@@ -12,7 +12,7 @@ exports.extractHOG = function(canvas, options) {
   var blockSize = options.blockSize || 2;
   var bins = options.bins || 6;
   var blockStride = options.blockStride || (blockSize / 2);
-  var normalize = norms[options.norm || "L1"];
+  var normalize = norms[options.norm || "L2"];
 
   var vectors = processing.gradientVectors(canvas);
 
