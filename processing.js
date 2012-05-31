@@ -60,16 +60,13 @@ var processing = {
   },
 
   gradientVectors: function(canvas) {
-    var gradients = this.gradients(canvas);
-    return this._gradientVectors(gradients);
+    var intensities = this.intensities(canvas);
+    return this._gradientVectors(intensities);
   },
 
-  _gradientVectors: function(gradients) {
-    var gradX = gradients.x,
-        gradY = gradients.y;
-
-    var height = gradX.length;
-    var width = gradX[0].length;
+  _gradientVectors: function(intensities) {
+    var height = intensities.length;
+    var width = intensities[0].length;
 
     var vectors = new Array(height);
 
@@ -77,12 +74,18 @@ var processing = {
       vectors[y] = new Array(width);
 
       for (var x = 0; x < width; x++) {
-        var hor = gradX[y][x];
-        var vert = gradY[y][x];
+        var prevX = x == 0 ? 0 : intensities[y][x - 1];
+        var nextX = x == width - 1 ? 0 : intensities[y][x + 1];
+        var prevY = y == 0 ? 0 : intensities[y - 1][x];
+        var nextY = y == height - 1 ? 0 : intensities[y + 1][x];
+
+        // kernel [-1, 0, 1]
+        var gradX = -prevX + nextX;
+        var gradY = -prevY + nextY;
 
         vectors[y][x] = {
-          mag: Math.sqrt(Math.pow(hor, 2) + Math.pow(vert, 2)),
-          orient: Math.atan2(vert, hor)
+          mag: Math.sqrt(Math.pow(gradX, 2) + Math.pow(gradY, 2)),
+          orient: Math.atan2(gradY, gradX)
         }
       }
     }
