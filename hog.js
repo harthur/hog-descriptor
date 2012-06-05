@@ -1,12 +1,22 @@
 var processing = require("./processing"),
     norms = require("./norms");
 
-// also export all the functions from processing.js
-for (var func in processing) {
-  exports[func] = processing[func];
+module.exports = {
+  extractHOG: extractHOG,
+  extractHOGFromIntensities: extractHOGFromIntensities
 }
 
-exports.extractHOG = function(canvas, options) {
+// also export all the functions from processing.js
+for (var func in processing) {
+  module.exports[func] = processing[func];
+}
+
+function extractHOG(canvas, options) {
+  var intensities = processing.intensities(canvas);
+  return extractHOGFromIntensities(intensities, options);
+}
+
+function extractHOGFromIntensities(intensities, options) {
   options = options || {};
   var cellSize = options.cellSize || 4;
   var blockSize = options.blockSize || 2;
@@ -14,10 +24,13 @@ exports.extractHOG = function(canvas, options) {
   var blockStride = options.blockStride || (blockSize / 2);
   var normalize = norms[options.norm || "L2"];
 
-  var vectors = processing.gradientVectors(canvas);
+  var vectors = processing._gradientVectors(intensities);
 
-  var cellsWide = Math.floor(canvas.width / cellSize);
-  var cellsHigh = Math.floor(canvas.height / cellSize);
+  var height = vectors.length;
+  var width = vectors[0].length;
+
+  var cellsWide = Math.floor(width / cellSize);
+  var cellsHigh = Math.floor(height / cellSize);
   var histograms = new Array(cellsHigh);
 
   for (var i = 0; i < cellsHigh; i++) {

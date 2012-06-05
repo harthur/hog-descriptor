@@ -1,18 +1,22 @@
 var processing = {
-  intensities: function(canvas) {
-    var context = canvas.getContext("2d");
-    var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+  intensities: function(imagedata) {
+    if (!imagedata.data) {
+      // it's a canvas, extract the imagedata
+      var canvas = imagedata;
+      var context = canvas.getContext("2d");
+      imagedata = context.getImageData(0, 0, canvas.width, canvas.height);
+    }
 
-    var lumas = new Array(canvas.height);
-    for (var y = 0; y < imageData.height; y++) {
-      lumas[y] = new Array(canvas.width);
+    var lumas = new Array(imagedata.height);
+    for (var y = 0; y < imagedata.height; y++) {
+      lumas[y] = new Array(imagedata.width);
 
-      for (var x = 0; x < imageData.height; x++) {
-        var i = x * 4 + y * 4 * imageData.width;
-        var r = imageData.data[i],
-            g = imageData.data[i + 1],
-            b = imageData.data[i + 2],
-            a = imageData.data[i + 3];
+      for (var x = 0; x < imagedata.height; x++) {
+        var i = x * 4 + y * 4 * imagedata.width;
+        var r = imagedata.data[i],
+            g = imagedata.data[i + 1],
+            b = imagedata.data[i + 2],
+            a = imagedata.data[i + 3];
 
         var luma = a == 0 ? 1 : (r * 299/1000 + g * 587/1000
           + b * 114/1000) / 255;
