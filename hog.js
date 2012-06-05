@@ -76,7 +76,12 @@ function binFor(radians, bins) {
   if (angle < 0) {
     angle += 180;
   }
-  var bin = Math.floor(angle / 181 * bins);
+
+  // center the first bin around 0
+  angle += 90 / bins;
+  angle %= 180;
+
+  var bin = Math.floor(angle / 180 * bins);
   return bin;
 }
 
