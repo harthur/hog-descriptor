@@ -63,9 +63,8 @@ function getNormalizedBlocks(histograms, blockSize, blockStride, normalize) {
 function getBlock(matrix, x, y, length) {
   var square = [];
   for (var i = y; i < y + length; i++) {
-    var row = matrix[i];
     for (var j = x; j < x + length; j++) {
-      square.push(row[j]);
+      square.push(matrix[i][j]);
     }
   }
   return Array.prototype.concat.apply([], square);
