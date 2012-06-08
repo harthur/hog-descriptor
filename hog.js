@@ -3,7 +3,7 @@ var processing = require("./processing"),
 
 module.exports = {
   extractHOG: extractHOG,
-  extractHOGFromIntensities: extractHOGFromIntensities
+  extractHOGFromVectors: extractHOGFromVectors
 }
 
 // also export all the functions from processing.js
@@ -12,25 +12,21 @@ for (var func in processing) {
 }
 
 function extractHOG(canvas, options) {
-  var intensities = processing.intensities(canvas);
-  return extractHOGFromIntensities(intensities, options);
+  var vectors = processing.gradientVectors(canvas);
+  return extractHOGFromVectors(vectors, options);
 }
 
-function extractHOGFromIntensities(intensities, options) {
+function extractHOGFromVectors(vectors, options) {
   options = options || {};
   var cellSize = options.cellSize || 4;
   var blockSize = options.blockSize || 2;
   var bins = options.bins || 6;
   var blockStride = options.blockStride || (blockSize / 2);
-  var normalize = norms[options.norm || "L2"];
+  var norm = norms[options.norm || "L2"];
 
-  var vectors = processing._gradientVectors(intensities);
+  var cellsWide = Math.floor(vectors.length / cellSize);
+  var cellsHigh = Math.floor(vectors[0].length / cellSize);
 
-  var height = vectors.length;
-  var width = vectors[0].length;
-
-  var cellsWide = Math.floor(width / cellSize);
-  var cellsHigh = Math.floor(height / cellSize);
   var histograms = new Array(cellsHigh);
 
   for (var i = 0; i < cellsHigh; i++) {
@@ -41,8 +37,9 @@ function extractHOGFromIntensities(intensities, options) {
                                       cellSize, bins);
     }
   }
-  var blocks = getNormalizedBlocks(histograms, blockSize, blockStride, normalize);
-  return blocks;
+  var descriptor = getNormalizedBlocks(histograms, blockSize, blockStride, norm);
+
+  return descriptor;
 }
 
 function getNormalizedBlocks(histograms, blockSize, blockStride, normalize) {
