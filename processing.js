@@ -41,7 +41,7 @@ var processing = {
 
     for (var y = 0; y < height; y++) {
       gradX[y] = new Array(width);
-      gradY[y] = new Array(height);
+      gradY[y] = new Array(width);
 
       var row = intensities[y];
 
