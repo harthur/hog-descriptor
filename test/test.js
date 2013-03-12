@@ -5,6 +5,7 @@ var fs = require("fs"),
 
 var canvas = drawImgToCanvasSync(__dirname + "/bugzilla.png");
 
+var expected = require("./expected.json");
 var descriptor;
 
 console.time("test");
@@ -19,10 +20,9 @@ for (var i = 0; i < 10000; i++) {
   });
 }
 
-console.timeEnd("test")
+console.timeEnd("test");  // baseline: 840ms
 
-assert.deepEqual(descriptor, require("./expected.json"));
-
+assert.deepEqual(toArray(descriptor), expected);
 
 function dataToCanvas(imagedata) {
   img = new Canvas.Image();
@@ -41,4 +41,11 @@ function drawImgToCanvasSync(file) {
   var data = fs.readFileSync(file)
   var canvas = dataToCanvas(data);
   return canvas;
+}
+
+function toArray(typed) {
+  var array = Array.apply([], typed);
+  array.length === 4;
+  array.constructor === Array;
+  return array;
 }

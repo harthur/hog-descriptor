@@ -44,17 +44,42 @@ function extractHOGFromVectors(vectors, options) {
 
 function getNormalizedBlocks(histograms, blockSize, blockStride, normalize) {
   var blocks = [];
+  var histLength = histograms[0][0].length;
   var blocksHigh = histograms.length - blockSize + 1;
   var blocksWide = histograms[0].length - blockSize + 1;
 
+  // length of block's array
+  var blockLength = blockSize * blockSize * histLength;
+
+  var descriptor = new Float64Array(blocksHigh * blocksWide * blockLength);
+
   for (var y = 0; y < blocksHigh; y += blockStride) {
     for (var x = 0; x < blocksWide; x += blockStride) {
-      var block = getBlock(histograms, x, y, blockSize);
+      var offset = (y * blocksHigh + x) * blockLength;
+
+      // write the histogram values for this block to the descriptor array
+      setBlock(descriptor, offset, histograms, x, y, blockSize);
+
+      // then normalize them in place
+      var block = descriptor.subarray(offset, offset + blockLength);
       normalize(block);
-      blocks.push(block);
     }
   }
-  return Array.prototype.concat.apply([], blocks);
+
+  return descriptor;
+}
+
+function setBlock(array, arrayOffset, histograms, x, y, blockSize) {
+  var histLength = histograms[0][0].length;
+
+  for (var i = 0; i < blockSize; i++) {
+    var histI = i + y;
+    for (var j = 0; j < blockSize; j++) {
+      // 3d array -> 2d array
+      var offset = (i * blockSize + j) * histLength;
+      array.set(histograms[y + i][x + j], arrayOffset + offset)
+    }
+  }
 }
 
 function getBlock(matrix, x, y, length) {
