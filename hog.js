@@ -3,7 +3,8 @@ var processing = require("./processing"),
 
 module.exports = {
   extractHOG: extractHOG,
-  extractHOGFromVectors: extractHOGFromVectors
+  extractHistograms: extractHistograms,
+  extractHOGFromHistograms: extractHOGFromHistograms
 }
 
 // also export all the functions from processing.js
@@ -12,20 +13,18 @@ for (var func in processing) {
 }
 
 function extractHOG(canvas, options) {
-  var vectors = processing.gradientVectors(canvas);
-  return extractHOGFromVectors(vectors, options);
+  var histograms = extractHistograms(canvas, options);
+  return extractHOGFromHistograms(histograms, options);
 }
 
-function extractHOGFromVectors(vectors, options) {
-  options = options || {};
-  var cellSize = options.cellSize || 4;
-  var blockSize = options.blockSize || 2;
-  var bins = options.bins || 6;
-  var blockStride = options.blockStride || (blockSize / 2);
-  var norm = norms[options.norm || "L2"];
+function extractHistograms(canvas, options) {
+  var vectors = processing.gradientVectors(canvas);
 
-  var cellsWide = Math.floor(vectors.length / cellSize);
-  var cellsHigh = Math.floor(vectors[0].length / cellSize);
+  var cellSize = options.cellSize || 4;
+  var bins = options.bins || 6;
+
+  var cellsWide = Math.floor(vectors[0].length / cellSize);
+  var cellsHigh = Math.floor(vectors.length / cellSize);
 
   var histograms = new Array(cellsHigh);
 
@@ -37,12 +36,17 @@ function extractHOGFromVectors(vectors, options) {
                                       cellSize, bins);
     }
   }
-  var descriptor = getNormalizedBlocks(histograms, blockSize, blockStride, norm);
-
-  return descriptor;
+  return histograms;
 }
 
-function getNormalizedBlocks(histograms, blockSize, blockStride, normalize) {
+/* This function is decoupled so you can extract histograms for an entire image
+ * to save recomputation, and use these to get HOGs from individual windows
+ */
+function extractHOGFromHistograms(histograms, options) {
+  var blockSize = options.blockSize || 2;
+  var blockStride = options.blockStride || (blockSize / 2);
+  var normalize = norms[options.norm || "L2"];
+
   var blocks = [];
   var blocksHigh = histograms.length - blockSize + 1;
   var blocksWide = histograms[0].length - blockSize + 1;
