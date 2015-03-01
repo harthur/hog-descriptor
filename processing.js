@@ -174,7 +174,7 @@ var processing = {
         if (orient < 0) {
           orient += 180;
         }
-        orient /= 180 * 255;
+        orient *= 255 / 180;
 
         imageData.data[i] = orient;
         imageData.data[i + 1] = orient;
